@@ -81,8 +81,22 @@ export default class WaterlineAdapter extends Storage {
 
   find(model, query, callback) {
     debug('Finding %s', model);
-    // @todo Pass second options parameter to find()? Or allow pre-/post- connection config?
-    this.getModel(model).find(query).exec(function(error, resources) {
+
+    // @todo Use model definition properties to filter the query parameters.
+    let whereQuery = _.omit(query, ['limit', 'page']);
+
+    // Initialize the request to the storage engine.
+    let request = this.getModel(model).find(whereQuery);
+
+    // Add pagination to the response, if requested.
+    // @todo Abstract this to be a bit more flexible.
+    let paginateQuery = _.pick(query, ['limit', 'page']);
+    if (paginateQuery.limit && paginateQuery.page) {
+      request.paginate(paginateQuery);
+    }
+
+    // Make the request to the storage engine.
+    request.exec(function(error, resources) {
       return callback(error, resources);
     });
   }
