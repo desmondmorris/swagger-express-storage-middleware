@@ -2,6 +2,8 @@
 
 let debug = require('debug')('swagger:storage');
 
+import {getId, respond} from './helpers';
+
 const methods = {
   GET: find,
   HEAD: find,
@@ -19,18 +21,6 @@ export default function handler(storage) {
   return (req, res, next) => {
     return methods[req.method](req, res, next);
   }
-}
-
-function getId(req) {
-  let idParam;
-  if (req.pathParams && req.swagger.params && req.swagger.params.length) {
-    req.swagger.params.forEach((param) => {
-      if (param.in === 'path') {
-        idParam = param.name;
-      }
-    });
-  }
-  return req.pathParams[idParam];
 }
 
 function find(req, res, next) {
@@ -88,14 +78,4 @@ function createResource(req, callback) {
 
 function destroyResource(req, callback) {
   Storage.destroy(req.swagger.resourceType, getId(req), callback);
-}
-
-function respond(err, resource, res, next, statusCode = 200) {
-  if (!err && resource) {
-    res.status(statusCode);
-    if (statusCode !== 204) {
-      res.swagger.data = resource;
-    }
-  }
-  return next(err);
 }
