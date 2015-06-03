@@ -7,10 +7,9 @@ const methods = {
   HEAD: find,
   OPTIONS: find,
   POST: create,
-  DELETE: destroy,
-  // POST: mergeResource,
-  // PATCH: mergeResource,
-  // PUT: overwriteResource,
+  // PATCH: update,
+  PUT: replace,
+  DELETE: destroy
 };
 
 let Storage;
@@ -54,6 +53,25 @@ function create(req, res, next) {
   }
 }
 
+// function update(req, res, next) {
+//   updateResource(req, (err, resource) => {
+//     return respond(err, resource, res, next);
+//   });
+// }
+
+function replace(req, res, next) {
+  // First delete the current resource.
+  destroyResource(req, (err, resource) => {
+    if (err) {
+      return next(err);
+    }
+    // Then create it again!
+    createResource(req, (err, resource) => {
+      return respond(err, resource, res, next);
+    });
+  });
+}
+
 function destroy(req, res, next) {
   destroyResource(req, (err, resource) => {
     return respond(err, resource, res, next, 204);
@@ -63,6 +81,10 @@ function destroy(req, res, next) {
 function createResource(req, callback) {
   Storage.create(req.swagger.resourceType, req.body, callback);
 }
+
+// function updateResource(req, callback) {
+//   Storage.update(req.swagger.resourceType, getId(req), req, callback);
+// }
 
 function destroyResource(req, callback) {
   Storage.destroy(req.swagger.resourceType, getId(req), callback);
