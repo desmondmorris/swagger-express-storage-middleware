@@ -48,8 +48,8 @@ function create(req, res, next) {
   if (req.swagger.params && req.swagger.params.length) {
     req.swagger.params.forEach((param) => {
       if (param.in === 'body') {
-        Storage.create(req.swagger.resourceType, req.body, (err, resource) => {
-          if (resource) {
+        createResource(req, (err, resource) => {
+          if (!err && resource) {
             res.status(201);
             res.swagger.data = resource;
           }
@@ -63,10 +63,18 @@ function create(req, res, next) {
 }
 
 function destroy(req, res, next) {
-  Storage.destroy(req.swagger.resourceType, getId(req), (err, resource) => {
-    if (resource) {
+  destroyResource(req, (err, resource) => {
+    if (!err && resource) {
       res.status(204);
     }
     return next(err);
   });
+}
+
+function createResource(req, callback) {
+  Storage.create(req.swagger.resourceType, req.body, callback);
+}
+
+function destroyResource(req, callback) {
+  Storage.destroy(req.swagger.resourceType, getId(req), callback);
 }
