@@ -36,11 +36,7 @@ function getId(req) {
 
 function find(req, res, next) {
   Storage.findById(req.swagger.resourceType, getId(req), (err, resource) => {
-    if (resource) {
-      res.status(200);
-      res.swagger.data = resource;
-    }
-    return next(err);
+    return respond(err, resource, res, next);
   });
 }
 
@@ -49,11 +45,7 @@ function create(req, res, next) {
     req.swagger.params.forEach((param) => {
       if (param.in === 'body') {
         createResource(req, (err, resource) => {
-          if (!err && resource) {
-            res.status(201);
-            res.swagger.data = resource;
-          }
-          return next(err);
+          return respond(err, resource, res, next);
         });
       }
     });
@@ -64,10 +56,7 @@ function create(req, res, next) {
 
 function destroy(req, res, next) {
   destroyResource(req, (err, resource) => {
-    if (!err && resource) {
-      res.status(204);
-    }
-    return next(err);
+    return respond(err, resource, res, next, 204);
   });
 }
 
@@ -77,4 +66,14 @@ function createResource(req, callback) {
 
 function destroyResource(req, callback) {
   Storage.destroy(req.swagger.resourceType, getId(req), callback);
+}
+
+function respond(err, resource, res, next, statusCode = 200) {
+  if (!err && resource) {
+    res.status(statusCode);
+    if (statusCode !== 204) {
+      res.swagger.data = resource;
+    }
+  }
+  return next(err);
 }
