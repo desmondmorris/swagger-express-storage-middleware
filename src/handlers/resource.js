@@ -2,15 +2,16 @@
 
 let debug = require('debug')('swagger:storage');
 
+import {getId, respond} from './helpers';
+
 const methods = {
   GET: find,
   HEAD: find,
   OPTIONS: find,
   POST: create,
-  DELETE: destroy,
-  // POST: mergeResource,
-  // PATCH: mergeResource,
-  // PUT: overwriteResource,
+  // PATCH: update,
+  PUT: replace,
+  DELETE: destroy
 };
 
 let Storage;
@@ -22,25 +23,9 @@ export default function handler(storage) {
   }
 }
 
-function getId(req) {
-  let idParam;
-  if (req.pathParams && req.swagger.params && req.swagger.params.length) {
-    req.swagger.params.forEach((param) => {
-      if (param.in === 'path') {
-        idParam = param.name;
-      }
-    });
-  }
-  return req.pathParams[idParam];
-}
-
 function find(req, res, next) {
   Storage.findById(req.swagger.resourceType, getId(req), (err, resource) => {
-    if (resource) {
-      res.status(200);
-      res.swagger.data = resource;
-    }
-    return next(err);
+    return respond(err, resource, res, next);
   });
 }
 
@@ -48,12 +33,8 @@ function create(req, res, next) {
   if (req.swagger.params && req.swagger.params.length) {
     req.swagger.params.forEach((param) => {
       if (param.in === 'body') {
-        Storage.create(req.swagger.resourceType, req.body, (err, resource) => {
-          if (resource) {
-            res.status(201);
-            res.swagger.data = resource;
-          }
-          return next(err);
+        createResource(req, (err, resource) => {
+          return respond(err, resource, res, next);
         });
       }
     });
@@ -62,11 +43,39 @@ function create(req, res, next) {
   }
 }
 
-function destroy(req, res, next) {
-  Storage.destroy(req.swagger.resourceType, getId(req), (err, resource) => {
-    if (resource) {
-      res.status(204);
+// function update(req, res, next) {
+//   updateResource(req, (err, resource) => {
+//     return respond(err, resource, res, next);
+//   });
+// }
+
+function replace(req, res, next) {
+  // First delete the current resource.
+  destroyResource(req, (err, resource) => {
+    if (err) {
+      return next(err);
     }
-    return next(err);
+    // Then create it again!
+    createResource(req, (err, resource) => {
+      return respond(err, resource, res, next);
+    });
   });
+}
+
+function destroy(req, res, next) {
+  destroyResource(req, (err, resource) => {
+    return respond(err, resource, res, next, 204);
+  });
+}
+
+function createResource(req, callback) {
+  Storage.create(req.swagger.resourceType, req.body, callback);
+}
+
+// function updateResource(req, callback) {
+//   Storage.update(req.swagger.resourceType, getId(req), req, callback);
+// }
+
+function destroyResource(req, callback) {
+  Storage.destroy(req.swagger.resourceType, getId(req), callback);
 }
