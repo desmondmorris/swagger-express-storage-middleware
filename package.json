@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "Storage engine middleware for use with swagger-express-middleware.",
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --source-maps",
     "lint": "standard",
