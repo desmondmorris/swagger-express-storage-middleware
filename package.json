@@ -6,6 +6,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "node_modules/.bin/rimraf lib && node_modules/.bin/babel src --out-dir lib --source-maps",
+    "lint": "standard",
     "postinstall": "npm run build",
     "prepublish": "npm run build",
     "test": "mocha",
@@ -23,7 +24,8 @@
     "swagger-express-middleware": "*"
   },
   "devDependencies": {
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "standard": "^4.0.1"
   },
   "author": "attn:",
   "repository": {
