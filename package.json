@@ -1,7 +1,7 @@
 {
   "name": "swagger-express-storage-middleware",
   "version": "1.0.0",
-  "description": "Storage middleware for use alongside swagger-express-middleware.",
+  "description": "Storage engine middleware for use with swagger-express-middleware.",
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
