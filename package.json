@@ -5,11 +5,11 @@
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha",
-    "build": "rimraf lib && babel src --out-dir lib --source-maps",
-    "watch": "npm run build -- --watch",
+    "build": "node_modules/.bin/rimraf lib && node_modules/.bin/babel src --out-dir lib --source-maps",
+    "postinstall": "npm run build",
     "prepublish": "npm run build",
-    "postinstall": "npm run build"
+    "test": "mocha",
+    "watch": "npm run build -- --watch"
   },
   "dependencies": {
     "babel": "^5.4.7",
