@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
-    "build": "node_modules/.bin/rimraf lib && node_modules/.bin/babel src --out-dir lib --source-maps",
+    "build": "rimraf lib && babel src --out-dir lib --source-maps",
     "lint": "standard",
     "postinstall": "npm run build",
     "prepublish": "npm run build",
